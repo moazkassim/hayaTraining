@@ -194,7 +194,7 @@ sliderLeftButton.onclick = () => {
     slideImage.src = sliderImgArray[currentIndex - 1];
     // console.log(slideImage.src);
   } else {
-    slideImage.src = sliderImgArray[sliderImgArray.length];
+    slideImage.src = sliderImgArray[sliderImgArray.length - 1];
   }
 };
 
@@ -204,6 +204,8 @@ sliderRightButton.onclick = () => {
   if (currentIndex < sliderImgArray.length - 1) {
     slideImage.src = sliderImgArray[currentIndex + 1];
     // console.log(sliderImgArray.indexOf(slideImage.src));
+  } else {
+    slideImage.src = sliderImgArray[0];
   }
 };
 
