@@ -1,32 +1,149 @@
+// men fashion
+function getCateData(categoryName) {
+  let CategoriesContainer = document.querySelector(".container-categories");
+  let uppercaseCategoryName = categoryName.replace(
+    /^./,
+    categoryName[0].toUpperCase()
+  );
+  document.querySelector(".head-divider").innerHTML = uppercaseCategoryName;
+  CategoriesContainer.innerHTML = "";
+  fetch(`https://fakestoreapi.com/products/category/${categoryName}`) //api for the get request
+    .then((response) => response.json())
+    .then((products) => {
+      products.forEach((product) => {
+        // create cate Product
+        let productDiv = document.createElement("div");
+        productDiv.dataId = product.id;
+        productDiv.className =
+          "cate p-[2px] pt-6 outline-white  bg-white relative border-2 rounded-md w-64 flex items-center justify-center cursor-pointer flex-col";
+        ///////////////////////////////////////////////////////////////////////////////////////////////////
+        /// create love icon abd watch icon div
+        let actionIcons = document.createElement("div");
+        actionIcons.className = "action-icons top-1 right-1 absolute";
+
+        /// create love image in action icon
+        let loveImg = document.createElement("img");
+        loveImg.src = "/images/heart small.svg";
+        // loveImg.addEventListener("click",()=>{
+        //   loveImg.classList.toggle("bg-red")
+        // })
+        loveImg.className = "mb-1 cursor-pointer bg-white rounded-full p-1";
+
+        /// create watch image in action icon
+        let watchImg = document.createElement("img");
+        watchImg.src = "/images/Group.svg";
+        watchImg.className = "cursor-pointer bg-white rounded-full p-[4px]";
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //create product image
+        let productImg = document.createElement("img");
+        productImg.src = product.image;
+        productImg.className = "pt-8 w-[135px] h-[185px] object-scale-down";
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //create inner cate
+        let innerCate = document.createElement("div");
+        innerCate.className =
+          "rounded  opacity-80 inner-cat mt-8 border-t-2 pt-3 h-[120px] w-full p-2 truncate";
+        //create price data div
+        let priceData = document.createElement("div");
+        priceData.className = "price-data flex items-center justify-between";
+        //create price
+        let price = document.createElement("p");
+        price.appendChild(document.createTextNode(`$ ${product.price} `));
+        price.className =
+          "product-Price text-lg font-medium leading-5 mb-3 text-[#ee50ff]";
+        // create add button
+        let addButton = document.createElement("BUTTON");
+        addButton.appendChild(document.createTextNode("Add"));
+        addButton.className =
+          " addProductToCart text-sm  rounded bg-[#ee50ff] text-white p-[3px] absolute right-2 ";
+
+        //button function
+        addButton.onclick = (e) => {
+          let productId = e.target.parentElement.closest(".cate").dataId;
+          addToCart(product.image, product.title, product.price);
+          let productSpanValue = productSpan.innerHTML;
+          productSpan.innerHTML = parseInt(productSpanValue) + 1;
+        };
+        ///////////////////////////////////////////////////////////////////////////////////////////////////
+        //create ul
+        let starUl = document.createElement("ul");
+        starUl.className = "flex items-center";
+        // create li
+        for (var i = 0; i < Math.floor(product.rating.rate); i++) {
+          let starLi = document.createElement("li");
+          let liImg = document.createElement("img");
+          liImg.src = "/images/Vector.svg";
+          starUl.appendChild(starLi);
+          starLi.appendChild(liImg);
+        }
+        ///////////////////////////////////////////////////////////////////////////////////////////////////
+        //create product title
+        let productTitle = document.createElement("p");
+        productTitle.className = "mt-3 text-[#8B96A5] text-over";
+        productTitle.appendChild(
+          document.createTextNode(product.title.slice(0, 35))
+        );
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        //append cate to body
+
+        CategoriesContainer.appendChild(productDiv);
+        // append action icon to cate
+
+        productDiv.appendChild(actionIcons);
+        // append images to action div/
+        actionIcons.appendChild(loveImg);
+        actionIcons.appendChild(watchImg);
+        //append product image to cate
+        productDiv.appendChild(productImg);
+        // append inner-cate to cate
+        productDiv.appendChild(innerCate);
+        // append price data to inner cate
+        innerCate.appendChild(priceData);
+        // append data to price data
+        priceData.appendChild(price);
+        price.appendChild(addButton);
+        //append ul to inner cate
+        innerCate.appendChild(starUl);
+        // append product tittle to inner cate
+        innerCate.appendChild(productTitle);
+        ////////////////////////////////
+      });
+      endLoadingScreen();
+    });
+}
 window.addEventListener("load", (event) => {
   //links div
   let linksDiv = document.querySelector(".links");
   fetch("https://fakestoreapi.com/products/categories")
     .then((res) => res.json())
-    .then((json) => {
-      json.forEach((element) => {
-        let capitalElement = element.replace(/^./, element[0].toUpperCase());
+    .then((categories) => {
+      categories.forEach((categoryName) => {
+        let uppercaseCategoryName = categoryName.replace(
+          /^./,
+          categoryName[0].toUpperCase()
+        );
         let linksLi = document.createElement("li");
         let linksA = document.createElement("a");
-        linksA.className = `${element}Li hover:text-[#ee50ff] cursor-pointer`;
+        linksA.className = `${categoryName}Li hover:text-[#ee50ff] cursor-pointer`;
         linksA.addEventListener("click", () => {
-          getCateData(capitalElement, element);
+          getCateData(categoryName);
         });
-        linksA.appendChild(document.createTextNode(capitalElement));
+        linksA.appendChild(document.createTextNode(uppercaseCategoryName));
         linksLi.appendChild(linksA);
         linksDiv.appendChild(linksLi);
       });
       let elementName = linksDiv.children[0].firstChild.innerHTML;
-      getCateData(elementName, elementName.toLowerCase());
+      getCateData(categories[0]);
       // console.log;
     });
 });
 
-function loadingScreen() {
+function endLoadingScreen() {
   let loadingScreen = document.querySelector(".loading-screen");
   loadingScreen.classList.add("hidden");
 }
-setTimeout(loadingScreen, 1000);
 
 // select cart icon
 let cartIcon = document.querySelector(".cart-icon");
@@ -97,116 +214,6 @@ function goToTop() {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// men fashion
-function getCateData(capitalElement, element) {
-  document.querySelector(".head-divider").innerHTML = capitalElement;
-  let containerCategories = document.querySelector(".container-categories");
-  containerCategories.innerHTML = "";
-  fetch("https://fakestoreapi.com/products") //api for the get request
-    .then((response) => response.json())
-    .then((result) => {
-      result.forEach((product) => {
-        if (product.category === element) {
-          // create cate Product
-          let cate = document.createElement("div");
-          cate.dataId = product.id;
-          cate.className =
-            "cate p-[2px] pt-6 outline-white  bg-white relative border-2 rounded-md w-64 flex items-center justify-center cursor-pointer flex-col";
-          ///////////////////////////////////////////////////////////////////////////////////////////////////
-          /// create love icon abd watch icon div
-          let actionIcons = document.createElement("div");
-          actionIcons.className = "action-icons top-1 right-1 absolute";
-
-          /// create love image in action icon
-          let loveImg = document.createElement("img");
-          loveImg.src = "/images/heart small.svg";
-          // loveImg.addEventListener("click",()=>{
-          //   loveImg.classList.toggle("bg-red")
-          // })
-          loveImg.className = "mb-1 cursor-pointer bg-white rounded-full p-1";
-
-          /// create watch image in action icon
-          let watchImg = document.createElement("img");
-          watchImg.src = "/images/Group.svg";
-          watchImg.className = "cursor-pointer bg-white rounded-full p-[4px]";
-          ////////////////////////////////////////////////////////////////////////////////////////////////////////
-          //create product image
-          let productImg = document.createElement("img");
-          productImg.src = product.image;
-          productImg.className = "pt-8 w-[115px] h-[165px] ";
-          ////////////////////////////////////////////////////////////////////////////////////////////////////////
-          //create inner cate
-          let innerCate = document.createElement("div");
-          innerCate.className =
-            "rounded  opacity-80 inner-cat mt-8 border-t-2 pt-3 h-[120px] w-full p-2 truncate";
-          //create price data div
-          let priceData = document.createElement("div");
-          priceData.className = "price-data flex items-center justify-between";
-          //create price
-          let price = document.createElement("p");
-          price.appendChild(document.createTextNode(`$ ${product.price} `));
-          price.className =
-            "product-Price text-lg font-medium leading-5 mb-3 text-[#ee50ff]";
-          // create add button
-          let addButton = document.createElement("BUTTON");
-          addButton.appendChild(document.createTextNode("Add"));
-          addButton.className =
-            " addProductToCart text-sm border-2 rounded bg-[#ee50ff] text-white p-[3px] absolute right-2 ";
-
-          //button function
-          addButton.onclick = (e) => {
-            let productId = e.target.parentElement.closest(".cate").dataId;
-            addToCart(product.image, product.title, product.price);
-            let productSpanValue = productSpan.innerHTML;
-            productSpan.innerHTML = parseInt(productSpanValue) + 1;
-          };
-          ///////////////////////////////////////////////////////////////////////////////////////////////////
-          //create ul
-          let starUl = document.createElement("ul");
-          starUl.className = "flex items-center";
-          // create li
-          for (var i = 0; i < Math.floor(product.rating.rate); i++) {
-            let starLi = document.createElement("li");
-            let liImg = document.createElement("img");
-            liImg.src = "/images/Vector.svg";
-            starUl.appendChild(starLi);
-            starLi.appendChild(liImg);
-          }
-          ///////////////////////////////////////////////////////////////////////////////////////////////////
-          //create product title
-          let productTitle = document.createElement("p");
-          productTitle.className = "mt-3 text-[#8B96A5] text-over";
-          productTitle.appendChild(document.createTextNode(product.title));
-
-          ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-          //append cate to body
-
-          containerCategories.appendChild(cate);
-          // append action icon to cate
-
-          cate.appendChild(actionIcons);
-          // append images to action div/
-          actionIcons.appendChild(loveImg);
-          actionIcons.appendChild(watchImg);
-          //append product image to cate
-          cate.appendChild(productImg);
-          // append inner-cate to cate
-          cate.appendChild(innerCate);
-          // append price data to inner cate
-          innerCate.appendChild(priceData);
-          // append data to price data
-          priceData.appendChild(price);
-          price.appendChild(addButton);
-          //append ul to inner cate
-          innerCate.appendChild(starUl);
-          // append product tittle to inner cate
-          innerCate.appendChild(productTitle);
-          ////////////////////////////////
-        }
-      });
-    });
-}
 function addToCart(imgSrc, title, price) {
   //create product div
   let product = document.createElement("div");
@@ -214,13 +221,13 @@ function addToCart(imgSrc, title, price) {
     "product mb-2 border-2 border-solid p-5 z-20 flex-row flex gap-14 relative items-center";
 
   //create product img div
-  let productImg = document.createElement("div");
-  productImg.className = "product-image border-2 border-solid p-2";
+  let productImgDiv = document.createElement("div");
+  productImgDiv.className = "product-image border-2 border-solid p-2";
 
   //create img
-  let imgIt = document.createElement("img");
-  imgIt.src = imgSrc;
-  imgIt.className = "w-[75px] h-[85px] w-max";
+  let productImg = document.createElement("img");
+  productImg.src = imgSrc;
+  productImg.className = "w-[105px] h-[115px] w-max object-scale-down";
 
   //  create product details
   let productDetails = document.createElement("div");
@@ -230,7 +237,7 @@ function addToCart(imgSrc, title, price) {
   // create product details para
   let productTitle = document.createElement("p");
   productTitle.className = "text-[#505050] text-base font-normal ";
-  productTitle.appendChild(document.createTextNode(title));
+  productTitle.appendChild(document.createTextNode(title.slice(0, 35)));
 
   // create product details span
   let productPrice = document.createElement("SPAN");
@@ -260,8 +267,8 @@ function addToCart(imgSrc, title, price) {
   ///////////////////////////////////////////////////////////////////////////////////////
   let cart = document.querySelector(".cart");
   cart.appendChild(product);
-  product.appendChild(productImg);
-  productImg.appendChild(imgIt);
+  product.appendChild(productImgDiv);
+  productImgDiv.appendChild(productImg);
   product.appendChild(productDetails);
   productDetails.appendChild(productTitle);
   productDetails.appendChild(productPrice);
