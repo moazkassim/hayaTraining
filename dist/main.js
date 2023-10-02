@@ -1,4 +1,5 @@
 // men fashion
+const localStorageArray = [];
 function getCateData(categoryName) {
   let CategoriesContainer = document.querySelector(".container-categories");
   let uppercaseCategoryName = categoryName.replace(
@@ -20,7 +21,6 @@ function getCateData(categoryName) {
         /// create love icon abd watch icon div
         let actionIcons = document.createElement("div");
         actionIcons.className = "action-icons top-1 right-1 absolute";
-
         /// create love image in action icon
         let loveImg = document.createElement("img");
         loveImg.src = "/images/heart small.svg";
@@ -28,7 +28,6 @@ function getCateData(categoryName) {
         //   loveImg.classList.toggle("bg-red")
         // })
         loveImg.className = "mb-1 cursor-pointer bg-white rounded-full p-1";
-
         /// create watch image in action icon
         let watchImg = document.createElement("img");
         watchImg.src = "/images/Group.svg";
@@ -56,13 +55,21 @@ function getCateData(categoryName) {
         addButton.appendChild(document.createTextNode("Add"));
         addButton.className =
           " addProductToCart text-sm  rounded bg-[#ee50ff] text-white p-[3px] absolute right-2 ";
-
         //button function
         addButton.onclick = (e) => {
           let productId = e.target.parentElement.closest(".cate").dataId;
-          addToCart(product.image, product.title, product.price);
+          addToCart(product);
           let productSpanValue = productSpan.innerHTML;
           productSpan.innerHTML = parseInt(productSpanValue) + 1;
+          let cartProduct = {
+            id: product.id,
+            title: product.title,
+            image: product.image,
+            price: product.price,
+          };
+          localStorageArray.push(cartProduct);
+          console.log(localStorageArray);
+          addProductToLocalStorage(localStorageArray);
         };
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         //create ul
@@ -83,14 +90,10 @@ function getCateData(categoryName) {
         productTitle.appendChild(
           document.createTextNode(product.title.slice(0, 35))
         );
-
         ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
         //append cate to body
-
         CategoriesContainer.appendChild(productDiv);
         // append action icon to cate
-
         productDiv.appendChild(actionIcons);
         // append images to action div/
         actionIcons.appendChild(loveImg);
@@ -144,7 +147,6 @@ function endLoadingScreen() {
   let loadingScreen = document.querySelector(".loading-screen");
   loadingScreen.classList.add("hidden");
 }
-
 // select cart icon
 let cartIcon = document.querySelector(".cart-icon");
 cartIcon.addEventListener("click", () => {
@@ -154,7 +156,6 @@ cartIcon.addEventListener("click", () => {
   cart.classList.toggle("hidden");
 });
 let productSpan = document.querySelector(".product-span");
-
 // create slider
 let sliderImgArray = [
   // "/images/playstation.png",
@@ -170,7 +171,6 @@ let slideImage = document.createElement("img");
 slideImage.className = "bg-transparent w-[410px] h-[300px] shrink-0 ";
 slideImage.src = sliderImgArray[1];
 liAdvertisement.appendChild(slideImage);
-
 //change slider img
 let sliderLeftButton = document.querySelector(".slider-left-button");
 sliderLeftButton.onclick = () => {
@@ -181,7 +181,6 @@ sliderLeftButton.onclick = () => {
     slideImage.src = sliderImgArray[sliderImgArray.length - 1];
   }
 };
-
 let sliderRightButton = document.querySelector(".slider-right-button");
 sliderRightButton.onclick = () => {
   let currentIndex = sliderImgArray.indexOf(slideImage.src.slice(21));
@@ -191,13 +190,6 @@ sliderRightButton.onclick = () => {
     slideImage.src = sliderImgArray[0];
   }
 };
-
-// let menu = document.querySelector("menu");
-// menu.addEventListener("click", () => {
-//   let menuSection = document.querySelector(".first-section");
-//   menuSection.classList.toggle("max-md:hidden  ");
-// });
-
 let toTopButton = document.getElementById("to-top-button");
 window.onscroll = function () {
   if (
@@ -209,12 +201,11 @@ window.onscroll = function () {
     toTopButton.classList.add("hidden");
   }
 };
-
 function goToTop() {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-function addToCart(imgSrc, title, price) {
+function addToCart(productObject) {
   //create product div
   let product = document.createElement("div");
   product.className =
@@ -226,7 +217,7 @@ function addToCart(imgSrc, title, price) {
 
   //create img
   let productImg = document.createElement("img");
-  productImg.src = imgSrc;
+  productImg.src = productObject.image;
   productImg.className = "w-[105px] h-[115px] w-max object-scale-down";
 
   //  create product details
@@ -237,12 +228,14 @@ function addToCart(imgSrc, title, price) {
   // create product details para
   let productTitle = document.createElement("p");
   productTitle.className = "text-[#505050] text-base font-normal ";
-  productTitle.appendChild(document.createTextNode(title.slice(0, 35)));
+  productTitle.appendChild(
+    document.createTextNode(productObject.title.slice(0, 35))
+  );
 
   // create product details span
   let productPrice = document.createElement("SPAN");
   productPrice.className = "text-[#333] text-base font-semibold mt-2 mb-2 bold";
-  productPrice.appendChild(document.createTextNode(`$ ${price}`));
+  productPrice.appendChild(document.createTextNode(`$ ${productObject.price}`));
 
   // create product details button's div
   let productDetailsButtons = document.createElement("div");
@@ -263,7 +256,6 @@ function addToCart(imgSrc, title, price) {
     let productSpanValue = productSpan.innerHTML;
     productSpan.innerHTML = parseInt(productSpanValue) - 1;
   };
-
   ///////////////////////////////////////////////////////////////////////////////////////
   let cart = document.querySelector(".cart");
   cart.appendChild(product);
@@ -276,3 +268,16 @@ function addToCart(imgSrc, title, price) {
   productDetailsButtons.appendChild(confirmBtn);
   productDetailsButtons.appendChild(removeBtn);
 }
+function addProductToLocalStorage(arr) {
+  localStorage.setItem("cartProducts", JSON.stringify(arr));
+}
+function getDataFromLocalStorage() {
+  let cartProducts = window.localStorage.getItem("cartProducts");
+  if (cartProducts) {
+    let arrayOfProductsFromLocalStorage = JSON.parse(cartProducts);
+    arrayOfProductsFromLocalStorage.forEach((ele) => {
+      addToCart(ele);
+    });
+  }
+}
+getDataFromLocalStorage();
