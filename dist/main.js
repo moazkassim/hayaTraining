@@ -1,5 +1,5 @@
 // men fashion
-const localStorageArray = [];
+let localStorageArray = [];
 function getCateData(categoryName) {
   let CategoriesContainer = document.querySelector(".container-categories");
   let uppercaseCategoryName = categoryName.replace(
@@ -68,7 +68,7 @@ function getCateData(categoryName) {
             price: product.price,
           };
           localStorageArray.push(cartProduct);
-          console.log(localStorageArray);
+
           addProductToLocalStorage(localStorageArray);
         };
         ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -213,7 +213,7 @@ function addToCart(productObject) {
 
   //create product img div
   let productImgDiv = document.createElement("div");
-  productImgDiv.className = "product-image border-2 border-solid p-2";
+  productImgDiv.className = "product-image  p-2";
 
   //create img
   let productImg = document.createElement("img");
@@ -275,7 +275,10 @@ function getDataFromLocalStorage() {
   let cartProducts = window.localStorage.getItem("cartProducts");
   if (cartProducts) {
     let arrayOfProductsFromLocalStorage = JSON.parse(cartProducts);
-    arrayOfProductsFromLocalStorage.forEach((ele) => {
+    localStorageArray = [...arrayOfProductsFromLocalStorage];
+    productSpan.innerHTML = localStorageArray.length;
+    console.log(localStorageArray);
+    localStorageArray.forEach((ele) => {
       addToCart(ele);
     });
   }
